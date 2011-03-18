@@ -103,7 +103,7 @@
 	// Commands from keyboard shortcut content script
 	//
 	
-	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+  chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     console.log("Received command, command=" + request.cmd)
       
     switch (request.cmd) {
@@ -114,6 +114,7 @@
     case "openTab":
       sendOpenTab(sender.tab.url);
       break;
+    }
     
     sendResponse({success: true});
   });
