@@ -1,0 +1,73 @@
+<html>
+<head>
+  <title>Open Everywhere! Options</title>
+  <script type="text/javascript">
+
+    var LEFT_ARROW = "icon-arrow-left.gif";
+    var RIGHT_ARROW = "icon-arrow-right.png";
+
+    // Saves options to localStorage.
+    function save_options() {
+      var txt = document.getElementById("clusterID");
+      var clusterID = txt.value;
+      localStorage["clusterID"] = clusterID;
+
+      if (document.getElementById("arrowLeft").checked) {
+        localStorage["arrowDirection"] = "left";
+        chrome.browserAction.setIcon({path: LEFT_ARROW});
+      } else {
+        localStorage["arrowDirection"] = "right";
+        chrome.browserAction.setIcon({path: RIGHT_ARROW});
+      }
+
+      // Update status to let user know options were saved.
+      var status = document.getElementById("status");
+      status.innerHTML = "Options Saved.";
+      setTimeout(function() {
+        status.innerHTML = "";
+      }, 750);
+    }
+
+    // Restores select box state to saved value from localStorage.
+    function restore_options() {
+      var arrowDirection = localStorage["arrowDirection"];
+      if (arrowDirection == undefined || arrowDirection == "left") {
+        document.getElementById("arrowLeft").checked = "checked";
+      } else {
+        document.getElementById("arrowRight").checked = "checked";
+      }
+      
+      var clusterID = localStorage["clusterID"];
+      if (!clusterID) 
+        return;
+      
+      document.getElementById("clusterID").value = clusterID;
+    }
+
+  </script>  
+</head>
+<body onload="restore_options()">
+  <div id="status"></div>
+  <div>
+    <label for="clusterID">
+      Cluster ID:
+      <input id="clusterID" type="text">
+    </label>
+  </div>
+  <div>
+
+      Arrow Direction:
+    <label for="arrowLeft">
+      <input id="arrowLeft" name="arrowDirection" type="radio" value="left">
+      Left
+    </label>
+    <label for="arrowRight">
+      <input id="arrowRight" name="arrowDirection" type="radio" value="right">
+      Right
+    </label>
+  </div>
+  <div>
+    <button onclick="save_options()">Save</button>
+  </div>
+</body>
+</html>

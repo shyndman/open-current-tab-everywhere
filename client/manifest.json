@@ -1,0 +1,22 @@
+{
+	"name": "Open Current Tab Everywhere!",
+	"version": "0.1",
+	"description": "Broadcasts the currently selected tab to listening computers, who then open it themselves.",
+	"icons": 
+	{
+		"48": "icon48.png"
+	},
+  "background_page": "background.html",
+  "options_page": "options.html",
+  "permissions": 
+  [
+    "tabs", 
+    "notifications",
+    "http://*/*"
+  ],
+  "browser_action": 
+  {
+    "name": "Open Current Tab Everywhere!",
+    "default_icon": "icon19.gif"
+  }
+}

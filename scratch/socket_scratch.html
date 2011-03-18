@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head><title>WebSocket Scratchpad</title></head>
+  <body>
+    
+    <script>
+      var cluster = "scott.hyndman.work";
+      var host = "ws://127.0.0.1:7000";
+      var socket = new WebSocket(host);
+      var localID;
+      
+  		socket.onopen = function(msg) { 
+  		  console.log("onOpen");
+  		  console.log(msg);
+  		};
+  		
+  		socket.onmessage = function(msg) {
+        var handler;
+        var parts = msg.data.split(",");
+
+        switch (parts[0]) {
+        case "connection":
+          handler = handleConnection;
+          break;
+          
+        case "openTab":
+          handler = handleOpenTab;
+          break;
+          
+        case "poke":
+          handler = handlePoke;
+          break;
+        }
+        
+        handler.apply(window, parts.slice(1));
+  		};
+  		
+  		var handleConnection = function(id) {
+  		  localID = id;
+  		  socket.send("join," + cluster);
+  		};
+  		
+  		var handleOpenTab = function(originID, url) {
+  		  console.log("Open tab, url=" + url);
+  		  
+  		  chrome.tabs.create({
+  		    url: url,
+  		    selected: true
+  		  });
+  		};
+  		
+  		var handlePoke = function(originID) {
+  		  console.log("Poke received");
+  		  
+        var notification = webkitNotifications.createNotification(
+          'Poke!',  // notification title
+          'Turn around...'  // notification body text
+        );
+  		};
+  		
+  		var sendOpenTab = function() {
+  		  console.log("sending open tab");
+  		  socket.send("openTab," + cluster + ",http://google.com");
+  		};
+  		
+  		var sendPoke = function() {
+  		  socket.send("poke," + cluster);
+  		};
+    </script>
+    <a href="#" onclick="sendOpenTab()">open tab</a>
+  </body>
+</html>
