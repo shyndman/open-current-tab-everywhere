@@ -18,5 +18,14 @@
   {
     "name": "Open Current Tab Everywhere!",
     "default_icon": "icon19.gif"
-  }
+  },
+  "content_scripts": 
+  [ 
+    {
+     "all_frames": true,
+     "js": [ "key_grabber.js" ],
+     "matches": [ "https://*/*", "http://*/*" ],
+     "run_at": "document_start"
+    } 
+  ]
 }

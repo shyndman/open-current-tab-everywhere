@@ -5,7 +5,7 @@
   // Global variables
   //
   
-  var broadcastHost = "ec2-50-16-68-195.compute-1.amazonaws.com";
+  var broadcastHost = "ws://ec2-50-16-68-195.compute-1.amazonaws.com:7000";
   var socket;
   var localID;
   var clusterID;
@@ -14,12 +14,16 @@
   // Socket setup
   //
   
-  var connectToBroadcaster = function() {
+  var connectToBroadcaster = function(socketOpened) {
     try {
       console.log("Connecting to broadcaster");
     
-  		socket = new WebSocket(host);
+  		socket = new WebSocket(broadcastHost);
+  		socket.onopen = socketOpened;
   		socket.onmessage = messageReceived;
+  		socket.onerror = function(e) {
+  		  console.error(e);
+  		};
   		socket.onclose = function() {
   		  socket = null;
 		  };
@@ -95,11 +99,30 @@
   };
 	
 	//
+	// Commands from keyboard shortcut content script
+	//
+	
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    console.log(sender.tab 
+      ? "from a content script:" + sender.tab.url 
+      : "from the extension");
+      
+    if (request.cmd == "poke")
+      sendPoke();
+    else
+      sendOpenTab(sender.tab.url);
+    
+    sendResponse({success: true});
+  });
+	
+	//
 	// Browser action
 	//
 
   // Called when the user clicks on the browser action.
   chrome.browserAction.onClicked.addListener(function(tab) {
+    console.log("Browser action invoked, clusterID=" + localStorage["clusterID"]);
+    
     // If we've changed clusters and we're already connected, disconnect
     var newClusterID = localStorage["clusterID"];
     if (newClusterID != clusterID && socket) {
@@ -111,12 +134,12 @@
       return;
       
     if (!socket)
-      connectToBroadcaster();
-      
-    // Get the current tab and blast it to the server
-    chrome.tabs.getSelected(undefined, function(tab) {
-      sendOpenTab(tab.url);
-    });
+      connectToBroadcaster(function() {
+        // Get the current tab and blast it to the server
+        chrome.tabs.getSelected(undefined, function(tab) {
+          sendOpenTab(tab.url);
+        });
+      });
   });
 </script>
 </head>
