@@ -1,4 +1,7 @@
-var ws = require('websocket-server');
+var ws = require('websocket-server'),
+    daemon = require('daemon');
+
+daemon.start();
 
 var server = ws.createServer({
   debug: true,

@@ -8,17 +8,13 @@ function consumeKeydown(e) {
           target.type.toUpperCase() == 'SEARCH'))) {
     return;
   }
-  
-  console.dir(e);
-  
+    
   if ((!e.metaKey && !e.ctrlKey) || !e.shiftKey || e.keyCode != 80) {
     return;
   }
   
   // Send a request to the background page
-  chrome.extension.sendRequest({cmd: "poke"}, function(response) {
-    console.log(response);
-  });
+  chrome.extension.sendRequest({cmd: "poke"});
 }
 
 window.addEventListener('keydown', consumeKeydown, true);

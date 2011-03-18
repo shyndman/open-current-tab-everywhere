@@ -6,9 +6,11 @@
   //
   
   var broadcastHost = "ws://ec2-50-16-68-195.compute-1.amazonaws.com:7000";
+  //var broadcastHost = "ws://localhost:7000"
+
   var socket;
   var localID;
-  var clusterID;
+  var clusterID = localStorage["clusterID"];
 
   //
   // Socket setup
@@ -66,9 +68,6 @@
 	var handleOpenTab = function(originID, url) {
 	  console.log("Open tab, url=" + url);
 	  
-	  if (localID == originID)
-	    return;
-	  
 	  chrome.tabs.create({
 	    url: url,
 	    selected: true
@@ -79,9 +78,11 @@
 	  console.log("Poke received");
 	  
     var notification = webkitNotifications.createNotification(
+      "", // no icon
       'Poke!',  // notification title
       'Turn around...'  // notification body text
     );
+    notification.show();
 	};
 	
 	//
@@ -103,14 +104,16 @@
 	//
 	
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    console.log(sender.tab 
-      ? "from a content script:" + sender.tab.url 
-      : "from the extension");
+    console.log("Received command, command=" + request.cmd)
       
-    if (request.cmd == "poke")
+    switch (request.cmd) {
+    case "poke":
       sendPoke();
-    else
+      break;
+
+    case "openTab":
       sendOpenTab(sender.tab.url);
+      break;
     
     sendResponse({success: true});
   });
@@ -140,7 +143,19 @@
           sendOpenTab(tab.url);
         });
       });
+    else
+      chrome.tabs.getSelected(undefined, function(tab) {
+        sendOpenTab(tab.url);
+      });
   });
+  
+  //
+  // Start 'er up
+  //
+  if (!clusterID)
+    return;
+
+  connectToBroadcaster();
 </script>
 </head>
 </html>
