@@ -1,19 +1,18 @@
 <html>
 <head>
 <script>
+
   //
-  // Global variables
+  // Global variables.
   //
   
   var broadcastHost = "ws://ec2-50-16-68-195.compute-1.amazonaws.com:7000";
-  //var broadcastHost = "ws://localhost:7000"
-
   var socket;
   var localID;
   var clusterID = localStorage["clusterID"];
 
   //
-  // Socket setup
+  // Socket setup.
   //
   
   var connectToBroadcaster = function(socketOpened) {
@@ -68,6 +67,9 @@
 	var handleOpenTab = function(originID, url) {
 	  console.log("Open tab, url=" + url);
 	  
+	  if (localID == originID)
+	    return;
+	  
 	  chrome.tabs.create({
 	    url: url,
 	    selected: true
@@ -86,7 +88,7 @@
 	};
 	
 	//
-	// Sending messages
+	// Sending messages.
 	//
 	
   var sendOpenTab = function(url) {
@@ -100,7 +102,7 @@
   };
 	
 	//
-	// Commands from keyboard shortcut content script
+	// Commands from keyboard shortcut content script.
 	//
 	
   chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -151,8 +153,9 @@
   });
   
   //
-  // Start 'er up
+  // Start 'er up (if we have a cluster configured)
   //
+  
   if (!clusterID)
     return;
 
